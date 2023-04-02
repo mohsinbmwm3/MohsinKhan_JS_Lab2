@@ -1,11 +1,3 @@
-
-{/* <div id="answer-button">
-    <button class="btn">B</button>
-    <button class="btn">F</button>
-    <button class="btn">A</button>
-    <button class="btn">Z</button>
-</div> */}
-
 const question = [
     {
         question: "First letter of english alphabet?",
@@ -42,9 +34,9 @@ const nextBtn = document.getElementById("next-btn");
 
 let currentQuestionIndex = 0
 let score = 0
- 
+
 function startQuiz() {
-    currentQuestionIndex = 0;
+    currentQuestionIndex = 1;
     score = 0;
     nextBtn.innerHTML = "Next";
     showQuestion();
@@ -60,6 +52,11 @@ function showQuestion() {
         btnAnswer.innerHTML = answer.text;
         btnAnswer.classList.add("btn");
         answerButtons.appendChild(btnAnswer);
+
+        if(answer.isCorrect) {
+            btnAnswer.dataset.isCorrect = answer.isCorrect;
+        }
+        btnAnswer.addEventListener("click", onSelectAnswer);
     });
 }
 
@@ -68,6 +65,23 @@ function resetState() {
     while(answerButtons.firstChild) {
         answerButtons.removeChild(answerButtons.firstChild);
     }
+}
+
+function onSelectAnswer(e) {
+    const selectedButton = e.target;
+    const isCorrect = e.dataset.isCorrect === "true";
+    if(isCorrect) {
+        selectedButton.classList.add("correct");
+    } else {
+        selectedButton.classList.add("incorrect");
+    }
+    Array.from(answerButtons.children).forEach(button => {
+        if(button.dataset.isCorrect === "true") {
+            button.classList.add("correct");
+        }
+        button.disabled = true;
+    });
+    nextBtn.style.display = "block";
 }
 
 startQuiz();
