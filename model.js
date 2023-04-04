@@ -25,6 +25,24 @@ const questions = [
             {text: "Dell", isCorrect: false},
             {text: "Lenovo", isCorrect: false}
         ]
+    },
+    {
+        question: "Capital of Madhya Pradesh?",
+        answers: [
+            {text: "Gwalior", isCorrect: false},
+            {text: "Indore", isCorrect: false},
+            {text: "Jabalpur", isCorrect: false},
+            {text: "Bhopal", isCorrect: true}
+        ]
+    },
+    {
+        question: "Oldest civilization of the world?",
+        answers: [
+            {text: "Chinese", isCorrect: false},
+            {text: "Indus Valley", isCorrect: false},
+            {text: "Mesopotamia", isCorrect: true},
+            {text: "Nile Valley", isCorrect: false}
+        ]
     }
 ];
 export {

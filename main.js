@@ -1,4 +1,5 @@
 import { questions } from "./model.js";
+import { passingDivision, calculatePercantage } from "./utils.js";
 
 const questionElement = document.getElementById("question");
 const containerForAnswerButtons = document.getElementById("answer-button");
@@ -44,7 +45,7 @@ function updateAnswers(answers) {
 }
 
 function resetStateOfAnswerButtonContainer() {
-    hideNextButton();
+    hideFooter();
     while(containerForAnswerButtons.firstChild) {
         containerForAnswerButtons.removeChild(containerForAnswerButtons.firstChild);
     }
@@ -61,7 +62,7 @@ function onSelectAnswer(e) {
         selectedButton.classList.add("incorrect");
     }
     disableOtherAnswerButtonsAfterSelectingAnAnswer();
-    showNextButton();
+    showFooter();
 }
 
 function disableOtherAnswerButtonsAfterSelectingAnAnswer() {
@@ -76,47 +77,37 @@ function disableOtherAnswerButtonsAfterSelectingAnAnswer() {
 // Show score/update text for score screen.
 function showScore() {
     resetStateOfAnswerButtonContainer();
-    const percentage = (score/questions.length) * 100
+    const percentage = calculatePercantage(score, questions.length);
     
     const para1 = `You scored ${score} out of ${questions.length}!`;
     const para2 = `Scoring percentage: ${percentage.toFixed(2)}%`;
     const para3 = `${passingDivision(percentage)}`
     questionElement.innerHTML = `${para1}<br>${para2}<br>${para3}`;
     nextButton.innerHTML = "Play Again";
-    showNextButton();
+    showFooter();
 }
 
 // Handle next button click, if there are questions to display then display next que otherwise show score
 function handleNextButton() {
     currentQuestionIndex++;
-    if(currentQuestionIndex < questions.length) {
-        showQuestion();
-    } else {
-        showScore();
-    }
+    shouldDisplayNextQuestion() ? showQuestion() : showScore();
 }
 
+// Event handler for next button
 nextButton.addEventListener("click", ()=> {    
-    if(currentQuestionIndex < questions.length) {
-        handleNextButton();
-    } else {
-        startQuiz();
-    }
+    shouldDisplayNextQuestion() ? handleNextButton() : startQuiz();
 });
 
-function showNextButton() {
+// Helper methods
+function showFooter() {
     nextButton.style.display = "block";
 }
-
-function hideNextButton() {
+function hideFooter() {
     nextButton.style.display = "none";
 }
-
-function passingDivision(percentage) {
-    return percentage >= 85 ? "Passed! First Division (Excellent)<br><span style='font-size:100px;'>&#128526;&#128526;&#128526;</span>" : 
-        (percentage >= 60 && percentage < 85 ? "Passed! First Division (Good)<br><span style='font-size:100px;'>&#128526;&#128526;</span>" : 
-        (percentage >= 50 && percentage < 60 ? "Passed! Second Division (Okay)<br><span style='font-size:100px;'>&#128526;&#128533;</span>" : 
-        (percentage >=30 && percentage < 50 ? "Passed! Third Division (Work harder)<br><span style='font-size:100px;'>&#128533;</span>" : "Failed<br><span style='font-size:100px;'>&#128561;&#128561;&#128561;</span>")));
+function shouldDisplayNextQuestion() {
+    return (currentQuestionIndex < questions.length);
 }
 
+// Entry point
 startQuiz();
