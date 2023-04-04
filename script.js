@@ -1,87 +1,122 @@
-const question = [
-    {
-        question: "First letter of english alphabet?",
-        answers: [
-            {text: "B", isCorrect: false},
-            {text: "F", isCorrect: false},
-            {text: "A", isCorrect: true},
-            {text: "Z", isCorrect: false}
-        ]
-    },
-    {
-        question: "Pench _________ Reserve",
-        answers: [
-            {text: "Deer", isCorrect: false},
-            {text: "Elephant", isCorrect: false},
-            {text: "Lion", isCorrect: false},
-            {text: "Tiger", isCorrect: true}
-        ]
-    },
-    {
-        question: "Macbook is a product of?",
-        answers: [
-            {text: "Google", isCorrect: false},
-            {text: "Apple", isCorrect: true},
-            {text: "Dell", isCorrect: false},
-            {text: "Lenovo", isCorrect: false}
-        ]
-    }
-]
+import { questions } from "./model.js";
 
 const questionElement = document.getElementById("question");
-const answerButtons = document.getElementById("answer-button");
-const nextBtn = document.getElementById("next-btn");
+const containerForAnswerButtons = document.getElementById("answer-button");
+const nextButton = document.getElementById("next-btn");
 
 let currentQuestionIndex = 0
 let score = 0
 
 function startQuiz() {
-    currentQuestionIndex = 1;
+    currentQuestionIndex = 0;
     score = 0;
-    nextBtn.innerHTML = "Next";
+    nextButton.innerHTML = "Next";
     showQuestion();
 }
 
+// Prints current question and answers
 function showQuestion() {
-    resetState();
-    let currentQuestion = question[currentQuestionIndex];
+    resetStateOfAnswerButtonContainer();
+
+    let currentQuestion = questions[currentQuestionIndex];
+    updateQuestionText(currentQuestion);
+    updateAnswers(currentQuestion.answers);
+}
+
+// Updates the questionElement text
+function updateQuestionText(currentQuestion) {
     let questionNo = currentQuestionIndex + 1;
     questionElement.innerHTML = questionNo + ". " + currentQuestion.question;
-    currentQuestion.answers.forEach(answer => {
+}
+
+// Updates the answers button
+function updateAnswers(answers) {
+    answers.forEach(answer => {
         const btnAnswer = document.createElement("button");
         btnAnswer.innerHTML = answer.text;
         btnAnswer.classList.add("btn");
-        answerButtons.appendChild(btnAnswer);
-
-        if(answer.isCorrect) {
-            btnAnswer.dataset.isCorrect = answer.isCorrect;
-        }
+        containerForAnswerButtons.appendChild(btnAnswer);
+        btnAnswer.dataset.isCorrect = answer.isCorrect;
+        
+        // Add event handler
         btnAnswer.addEventListener("click", onSelectAnswer);
     });
 }
 
-function resetState() {
-    nextBtn.style.display = "none";
-    while(answerButtons.firstChild) {
-        answerButtons.removeChild(answerButtons.firstChild);
+function resetStateOfAnswerButtonContainer() {
+    hideNextButton();
+    while(containerForAnswerButtons.firstChild) {
+        containerForAnswerButtons.removeChild(containerForAnswerButtons.firstChild);
     }
 }
 
+// Answer button action handler
 function onSelectAnswer(e) {
     const selectedButton = e.target;
-    const isCorrect = e.dataset.isCorrect === "true";
+    const isCorrect = selectedButton.dataset.isCorrect === "true";
     if(isCorrect) {
         selectedButton.classList.add("correct");
+        score++; 
     } else {
         selectedButton.classList.add("incorrect");
     }
-    Array.from(answerButtons.children).forEach(button => {
+    disableOtherAnswerButtonsAfterSelectingAnAnswer();
+    showNextButton();
+}
+
+function disableOtherAnswerButtonsAfterSelectingAnAnswer() {
+    Array.from(containerForAnswerButtons.children).forEach(button => {
         if(button.dataset.isCorrect === "true") {
             button.classList.add("correct");
         }
         button.disabled = true;
     });
-    nextBtn.style.display = "block";
+}
+
+// Show score/update text for score screen.
+function showScore() {
+    resetStateOfAnswerButtonContainer();
+    const percentage = (score/questions.length) * 100
+    
+    const para1 = `You scored ${score} out of ${questions.length}!`;
+    const para2 = `Scoring percentage: ${percentage.toFixed(2)}%`;
+    const para3 = `${passingDivision(percentage)}`
+    questionElement.innerHTML = `${para1}<br>${para2}<br>${para3}`;
+    nextButton.innerHTML = "Play Again";
+    showNextButton();
+}
+
+// Handle next button click, if there are questions to display then display next que otherwise show score
+function handleNextButton() {
+    currentQuestionIndex++;
+    if(currentQuestionIndex < questions.length) {
+        showQuestion();
+    } else {
+        showScore();
+    }
+}
+
+nextButton.addEventListener("click", ()=> {    
+    if(currentQuestionIndex < questions.length) {
+        handleNextButton();
+    } else {
+        startQuiz();
+    }
+});
+
+function showNextButton() {
+    nextButton.style.display = "block";
+}
+
+function hideNextButton() {
+    nextButton.style.display = "none";
+}
+
+function passingDivision(percentage) {
+    return percentage >= 85 ? "Passed! First Division (Excellent)<br><span style='font-size:100px;'>&#128526;&#128526;&#128526;</span>" : 
+        (percentage >= 60 && percentage < 85 ? "Passed! First Division (Good)<br><span style='font-size:100px;'>&#128526;&#128526;</span>" : 
+        (percentage >= 50 && percentage < 60 ? "Passed! Second Division (Okay)<br><span style='font-size:100px;'>&#128526;&#128533;</span>" : 
+        (percentage >=30 && percentage < 50 ? "Passed! Third Division (Work harder)<br><span style='font-size:100px;'>&#128533;</span>" : "Failed<br><span style='font-size:100px;'>&#128561;&#128561;&#128561;</span>")));
 }
 
 startQuiz();
