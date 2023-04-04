@@ -63,7 +63,8 @@ body {
 #next-btn {
     background: #001e4d;
     color: #fff;
-    font-weight: 500;
+    font-weight: 700;
+    font-size: medium;
     width: 150px;
     border: 0px;
     padding: 10px;
